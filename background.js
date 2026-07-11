@@ -70,7 +70,12 @@ async function checkActiveTab() {
 
   const elapsed = (Date.now() - startTime) / 1000;
   if (elapsed >= config.limitSeconds) {
-    chrome.tabs.remove(tab.id);
+    const windowTabs = await chrome.tabs.query({ windowId: tab.windowId });
+    if (windowTabs.length <= 1) {
+      chrome.tabs.update(tab.id, { url: "chrome://newtab" });
+    } else {
+      chrome.tabs.remove(tab.id);
+    }
     resetTimer();
   }
 }
